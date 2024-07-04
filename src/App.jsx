@@ -9,9 +9,6 @@ function App() {
     const formData = new FormData(formRef.current)
     const token = formData.get('cf-turnstile-response')
 
-    // console.log('token', token)
-    // console.log('formData', formData)
-
     // POSTメソッドでトークンをJSON形式でバックエンドに送信
     const res = await fetch('/turnstile', {
       method: 'POST',
@@ -21,13 +18,11 @@ function App() {
       },
     })
 
-    console.log('res', res)
-
     const data = await res.json()
 
-    console.log('data', data)
     if (data.success) {
       // 検証成功時の処理
+      console.log('data', data)
       console.log('Success!')
     }
   }
