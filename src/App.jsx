@@ -28,7 +28,7 @@ function App() {
     console.log('data', data)
     if (data.success) {
       // 検証成功時の処理
-      console.log('Success!!!!!!!!!')
+      console.log('Success!')
     }
   }
 
