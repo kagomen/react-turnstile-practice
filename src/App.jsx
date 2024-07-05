@@ -1,39 +1,74 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { Turnstile } from '@marsidev/react-turnstile'
-import { useRef } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { schema } from './utils/schema'
 
 function App() {
-  const formRef = new useRef()
+  const [turnstileToken, setTurnstileToken] = useState()
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const formData = new FormData(formRef.current)
-    const token = formData.get('cf-turnstile-response')
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: yupResolver(schema) })
 
-    // POSTメソッドでトークンをJSON形式でバックエンドに送信
-    const res = await fetch('/turnstile', {
-      method: 'POST',
-      body: JSON.stringify({ token }),
-      headers: {
-        'content-type': 'application/json',
-      },
-    })
+  async function onSubmit(data) {
+    try {
+      const turnstileResponse = await fetch('/turnstile', {
+        method: 'POST',
+        body: JSON.stringify({ token: turnstileToken }),
+        headers: {
+          'content-type': 'application/json',
+        },
+      })
 
-    const data = await res.json()
+      console.log('turnstileResponse', turnstileResponse)
 
-    if (data.success) {
-      // 検証成功時の処理
-      console.log('data', data)
-      console.log('Success!')
+      if (!turnstileResponse.ok) {
+        throw new Error('Turnstile の検証が失敗しました')
+      }
+
+      const resendResponse = await fetch('/resend', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'content-type': 'application/json',
+        },
+      })
+
+      if (!resendResponse.ok) {
+        throw new Error('メールの送信に失敗しました')
+      }
+      alert('お問い合わせ内容を送信しました！')
+      reset() // フォームをリセット
+    } catch (error) {
+      alert(error.message)
     }
   }
 
   return (
     <div>
-      <p>Tunrstile practice</p>
-      <form ref={formRef} onSubmit={handleSubmit}>
-        {/* <input type="text" /> */}
-        <Turnstile siteKey={import.meta.env.VITE_SITE_KEY} />
-        <button>submit</button>
+      <h1>Cloudflare Tunrstile practice</h1>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <label>
+          名前:
+          <input type="text" {...register('name')} />
+          <p>{errors.name?.message}</p>
+        </label>
+        <label>
+          メールアドレス:
+          <input type="email" {...register('email')} />
+          <p>{errors.email?.message}</p>
+        </label>
+        <label>
+          お問い合わせ内容:
+          <textarea {...register('message')}></textarea>
+          <p>{errors.message?.message}</p>
+        </label>
+        <Turnstile siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY} onSuccess={setTurnstileToken} />
+        <button disabled={isSubmitting}>{!isSubmitting ? '送信する' : '送信中...'}</button>
       </form>
     </div>
   )

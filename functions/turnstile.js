@@ -3,19 +3,20 @@ import { handle } from 'hono/cloudflare-pages'
 
 const app = new Hono()
 
-const verifyEndpoint = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-
 app.post('/turnstile', async (c) => {
   const { token } = await c.req.json()
 
-  let formData = new FormData()
-  formData.append('secret', c.env.SECRET_KEY)
+  const formData = new FormData()
+  formData.append('secret', c.env.TURNSTILE_SECRET_KEY)
   formData.append('response', token)
 
   // fetchリクエスト送信時にFormDataオブジェクトを使っているため、
   // content-typeヘッダーは自動的に適切な値（multipart/form-data）に設定される
   // なので手動でcontent-typeを指定する必要はない
-  const result = await fetch(verifyEndpoint, {
+
+  const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+
+  const result = await fetch(url, {
     body: formData,
     method: 'POST',
   })
@@ -24,9 +25,9 @@ app.post('/turnstile', async (c) => {
   return c.json(data)
 
   // const { token } = await c.req.json()
-  // const secret = c.env.SECRET_KEY
+  // const secret = c.env.TURNSTILE_SECRET_KEY
 
-  // const res = await fetch(verifyEndpoint, {
+  // const res = await fetch(url, {
   //   method: 'POST',
   //   body: `secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
   //   headers: {
