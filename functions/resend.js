@@ -1,13 +1,17 @@
 import { Resend } from 'resend'
 import { Hono } from 'hono'
 import { handle } from 'hono/cloudflare-pages'
+import { zValidator } from '@hono/zod-validator'
+import { schema } from '../utils/schema'
 
 const app = new Hono()
 
-app.post('/resend', async (c) => {
+app.post('/resend', zValidator('json', schema), async (c) => {
+  // schemaファイルでバリデーションを行う
+  const { name, email, message } = c.req.valid('json')
+
   const resend = new Resend(c.env.RESEND_API_KEY)
 
-  const { name, email, message } = await c.req.json()
   const res = await resend.emails.send({
     from: `kagome <${c.env.MY_EMAIL_ADDRESS}>`,
     to: c.env.MY_EMAIL_ADDRESS,

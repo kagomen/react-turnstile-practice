@@ -61,6 +61,22 @@ try {
 - Turnstile ウィジェットに`onSuccess={setToken}`を指定すると token が注入される
   - https://docs.page/marsidev/react-turnstile/get-widget-token#onsuccess-callback
 
+## Vite
+
+- config で`__dirname`を使う方法
+
+  - https://flaviocopes.com/fix-dirname-not-defined-es-module-scope/
+
+- src ディレクトリ外にアクセスする方法
+  - config で以下のように設定する
+  ```js
+  resolve: {
+    alias: {
+      '@utils': path.resolve(__dirname, 'utils'),
+    },
+  }
+  ```
+
 ## Turnstile の処理の流れ
 
 > ChatGPT

@@ -1,8 +1,8 @@
-import { yupResolver } from '@hookform/resolvers/yup'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { schema } from './utils/schema'
+import { schema } from '@utils/schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 function App() {
   const [turnstileToken, setTurnstileToken] = useState()
@@ -12,7 +12,7 @@ function App() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: yupResolver(schema) })
+  } = useForm({ resolver: zodResolver(schema) })
 
   async function onSubmit(data) {
     try {
