@@ -33,4 +33,11 @@ p {
   margin: 0;
   color: red;
   font-size: 12px;
+
+  &.text {
+    color: black;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 16px;
+  }
 }

@@ -70,6 +70,7 @@ function App() {
         <Turnstile siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY} onSuccess={setTurnstileToken} />
         <button disabled={isSubmitting}>{!isSubmitting ? '送信する' : '送信中...'}</button>
       </form>
+      <p className="text">※ 本番環境ではキーの設定をしてないので送信できません</p>
     </div>
   )
 }
